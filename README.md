@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>
@@ -71,3 +72,7 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](LICENSE).
+=======
+# Mini_projetVueJS M1ISIDS 2026
+élaboré par Khadija Hassanine & Aicha Shili
+>>>>>>> b280dc362a486fdb2baade6674aed5c2a2d2df3d
