@@ -33,6 +33,21 @@ export class BookEntity extends TimeStampISIDS {
     
     @Column()
     image : string;
+
+    @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+    price: number;
+
+    @Column({ default: 'General' })
+    category: string;
+
+    @Column({ type: 'int', default: 4 })
+    rating: number;
+
+    @Column({ default: false })
+    isNew: boolean;
+
+    @Column({ type: 'int', default: 0 })
+    discount: number;
     
     @ManyToOne(type => AuthorEntity, author => author.id,   {
                // eager : true

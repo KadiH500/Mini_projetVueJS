@@ -41,7 +41,7 @@ export class AuthService {
         // let password = informations.password;
         
         // Destructing
-        let { identifiant, password } = informations;
+        let { identifiant, password } = informations;
         
         let qb = await this.userRepo.createQueryBuilder('user');
         let user = await qb.select('user')
@@ -55,8 +55,9 @@ export class AuthService {
         
         if(resultMatching) {
             let token = this.jwtSer.sign({id:  user.id})
+            const { password: _password, salt: _salt, ...safeUser } = user;
             return {
-                ...user,
+                ...safeUser,
                 access_token : token
             }
         }

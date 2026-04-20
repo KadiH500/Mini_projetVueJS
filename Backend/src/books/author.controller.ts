@@ -21,7 +21,7 @@ export class AuthorController {
     @Post('add')
     async ajouterAuteur(@Body() body) {
         try {
-            let data = this.authService.addAuthor(body);
+            let data = await this.authService.addAuthor(body);
             return data
             
         }

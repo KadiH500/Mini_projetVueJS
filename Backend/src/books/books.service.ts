@@ -2,20 +2,23 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BookEntity } from './entities/book.entity';
 import { Repository } from 'typeorm';
+import { AuthorEntity } from './entities/author.entity';
 
 @Injectable()
 export class BooksService {
   constructor(
     @InjectRepository(BookEntity) private bookRepo: Repository<BookEntity>,
+    @InjectRepository(AuthorEntity) private authorRepo: Repository<AuthorEntity>,
   ) {}
 
   async getAllBooks() {
     try {
-      let tab = await this.bookRepo.find(
-        {
-            loadRelationIds : true
-        }
-      );
+      await this.seedDefaultBooks();
+      let tab = await this.bookRepo.find({
+        relations: {
+          author: true,
+        },
+      });
       return { listeBooks: tab };
     } catch (err) {
       return { message: 'Problème avec TypeOrm' };
@@ -66,6 +69,7 @@ export class BooksService {
       //   image: uBook.image,
       ...uBook,
     });
+    if (!b) throw new NotFoundException('Livre introuvable');
     let response = await this.bookRepo.save(b);
     return { message: 'Livre mise à jour', response };
   }
@@ -79,6 +83,7 @@ export class BooksService {
     let selectedBook = await this.bookRepo.findOneBy({
       id: selectedId,
     });
+    if (!selectedBook) throw new NotFoundException('Livre introuvable');
     let response = await this.bookRepo.remove(selectedBook);
     return {
         message: `Le livre ${response.title} a été supprimé avec succès`,
@@ -100,6 +105,7 @@ async restoreBook(id) {
       id: selectedId,
       
     });
+    if (!selectedBook) throw new NotFoundException('Livre introuvable');
     let response = await this.bookRepo.recover(selectedBook);
     return {
         message: `Le livre ${response.title} a été restauré avec succès`,
@@ -110,6 +116,7 @@ async softRemoveBook(selectedId) {
       let selectedBook = await this.bookRepo.findOneBy({
         id: selectedId,
       });
+    if (!selectedBook) throw new NotFoundException('Livre introuvable');
     let reponse = await this.bookRepo.softRemove(selectedBook)
     return reponse;
   }
@@ -129,12 +136,117 @@ async softRemoveBook(selectedId) {
     .groupBy('book.year')
     .getRawMany()
   }
-    
-    
-    
-    
-    
-    
-    
-  
+
+  private async seedDefaultBooks() {
+    const defaultBooks = [
+      {
+        title: '1984',
+        year: 1949,
+        editor: 'Secker and Warburg',
+        image: '',
+        author: { prenom: 'George', nom: 'Orwell' },
+        price: 20,
+        category: 'Fiction',
+        rating: 5,
+        isNew: false,
+        discount: 0,
+      },
+      {
+        title: 'Dune',
+        year: 1965,
+        editor: 'Chilton Books',
+        image: '',
+        author: { prenom: 'Frank', nom: 'Herbert' },
+        price: 25,
+        category: 'Sci-fi',
+        rating: 5,
+        isNew: false,
+        discount: 0,
+      },
+      {
+        title: 'Atomic Habits',
+        year: 2018,
+        editor: 'Avery',
+        image: '',
+        author: { prenom: 'James', nom: 'Clear' },
+        price: 32,
+        category: 'Self-help',
+        rating: 5,
+        isNew: false,
+        discount: 10,
+      },
+      {
+        title: 'Sapiens',
+        year: 2011,
+        editor: 'Harvill Secker',
+        image: '',
+        author: { prenom: 'Yuval Noah', nom: 'Harari' },
+        price: 35,
+        category: 'History',
+        rating: 4,
+        isNew: false,
+        discount: 15,
+      },
+      {
+        title: 'The Lean Startup',
+        year: 2011,
+        editor: 'Crown Publishing Group',
+        image: '',
+        author: { prenom: 'Eric', nom: 'Ries' },
+        price: 30,
+        category: 'Business',
+        rating: 4,
+        isNew: true,
+        discount: 0,
+      },
+    ];
+
+    for (const defaultBook of defaultBooks) {
+      let author = await this.authorRepo.findOne({
+        where: {
+          prenom: defaultBook.author.prenom,
+          nom: defaultBook.author.nom,
+        },
+      });
+
+      if (!author) {
+        author = await this.authorRepo.save(defaultBook.author);
+      }
+
+      const existingBook = await this.bookRepo.findOne({
+        where: {
+          title: defaultBook.title,
+        },
+      });
+
+      if (existingBook) {
+        await this.bookRepo.save({
+          ...existingBook,
+          year: defaultBook.year,
+          editor: defaultBook.editor,
+          image: defaultBook.image,
+          author,
+          price: defaultBook.price,
+          category: defaultBook.category,
+          rating: defaultBook.rating,
+          isNew: defaultBook.isNew,
+          discount: defaultBook.discount,
+        });
+        continue;
+      }
+
+      await this.bookRepo.save({
+        title: defaultBook.title,
+        year: defaultBook.year,
+        editor: defaultBook.editor,
+        image: defaultBook.image,
+        author,
+        price: defaultBook.price,
+        category: defaultBook.category,
+        rating: defaultBook.rating,
+        isNew: defaultBook.isNew,
+        discount: defaultBook.discount,
+      });
+    }
+  }
 }

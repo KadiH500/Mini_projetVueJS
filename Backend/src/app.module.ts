@@ -16,20 +16,23 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     TasksModule,
     BooksModule,
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: process.env.HOST,
-      port: Number(process.env.PORT),
-      username: 'root',
-      password: 'root',
-      database: 'isids26',
-      autoLoadEntities: true,
-      synchronize: true,
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type: 'mysql',
+        host: configService.get<string>('DB_HOST', '127.0.0.1'),
+        port: Number(configService.get<string>('DB_PORT', '3306')),
+        username: configService.get<string>('DB_USER', 'root'),
+        password: configService.get<string>('DB_PASSWORD', 'root'),
+        database: configService.get<string>('DB_NAME', 'isids26'),
+        autoLoadEntities: true,
+        synchronize: configService.get<string>('DB_SYNC', 'true') === 'true',
+      }),
     }),
     AuthModule,
-    ConfigModule.forRoot()
   ],
   controllers: [AppController],
   providers: [AppService],
@@ -44,6 +47,4 @@ export class AppModule implements NestModule {
       method: RequestMethod.GET,
     });
   }
-  
-  constructor(private configSer : ConfigService) {}
 }

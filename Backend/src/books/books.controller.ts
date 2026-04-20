@@ -15,8 +15,8 @@ import {
 } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { JwtAuthGuard } from 'src/guards/jwt-auth/jwt-auth.guard';
-import { request } from 'express';
 import { IsAdminGuard } from 'src/guards/is-admin/is-admin.guard';
+import { Request } from 'express';
 
 
 @Controller('books')
@@ -26,7 +26,6 @@ export class BooksController {
 
   @Get('/all')
   async chercherTousLesLivres(@Req() req: Request) {
-    console.log(req);
     try {
       let data = await this.bookSer.getAllBooks();
       return data;
@@ -45,14 +44,12 @@ export class BooksController {
   @UseGuards(JwtAuthGuard)
   @Get('/search/:id')
   async chercherBook(@Param('id', ParseIntPipe) id, @Req() request) {
-    console.log("ROLE", request.user.userRole);
-    
     return this.bookSer.getBookById(id);
   }
 
   @Put('/edit/:id')
   async modifierBook(@Body() body, @Param('id', ParseIntPipe) id) {
-    let response = await this.bookSer.updateBook(body, id);
+    let response = await this.bookSer.updateBook(id, body);
     return response;
   }
 
