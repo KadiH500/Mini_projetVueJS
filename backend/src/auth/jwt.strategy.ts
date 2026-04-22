@@ -9,22 +9,32 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
-    @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
-    private configSer : ConfigService
+    @InjectRepository(UserEntity)
+    private readonly userRepo: Repository<UserEntity>,
+
+    private readonly configService: ConfigService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configSer.get('SECRET_KEY')
+
+      // 🔥 sécurisé + flexible (env variable)
+      secretOrKey: configService.get('SECRET_KEY') || 'supersecretcode',
     });
   }
 
   async validate(payload: any) {
-    console.log(payload);
-    let u = await this.userRepo.findOne({ where: { id: payload.id } });
-    console.log(u);
-    
+    const user = await this.userRepo.findOne({
+      where: { id: payload.id },
+    });
 
-    return { userRole: u.role, userId : u.id };
+    if (!user) {
+      return null;
+    }
+
+    return {
+      userId: user.id,
+      userRole: user.role,
+    };
   }
 }

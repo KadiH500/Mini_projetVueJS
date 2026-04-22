@@ -19,15 +19,15 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     TasksModule,
     BooksModule,
     TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3307,
-      username: 'root',
-      password: '',
-      database: 'isids26',
-      autoLoadEntities: true,
-      synchronize: true,
-    }),
+        type: 'postgres',
+        host: 'localhost',
+        port: 5433,
+        username: 'postgres',
+        password: 'root',
+        database: 'books',
+        autoLoadEntities: true,
+        synchronize: true,
+}),
     AuthModule,
     ConfigModule.forRoot({
   isGlobal: true,
@@ -38,8 +38,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    // consumer.apply(FirstMiddleware).forRoutes(''); // appliqué pour toutes les routes
-    // consumer.apply(FirstMiddleware).forRoutes('tasks/*'); // appliqué pour toutes les routes
     consumer.apply(SecondMiddleware).forRoutes('');
     consumer.apply(FirstMiddleware).forRoutes({
       path: 'tasks/*',
@@ -47,5 +45,5 @@ export class AppModule implements NestModule {
     });
   }
   
-  constructor(private configSer : ConfigService) {}
+  constructor(private readonly configSer: ConfigService) {}
 }
