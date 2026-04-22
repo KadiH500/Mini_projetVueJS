@@ -18,6 +18,8 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   data() {
     return {
@@ -26,8 +28,23 @@ export default {
     };
   },
   methods: {
-    login() {
-      console.log(this.email, this.password);
+    async login() {
+      try {
+        const res = await axios.post("http://localhost:3000/auth/signin", {
+          email: this.email,
+          password: this.password,
+        });
+
+        // stocker le token
+        localStorage.setItem("token", res.data.access_token);
+
+        // redirection vers dashboard
+        this.$router.push("/dashboard");
+
+      } catch (err) {
+        alert("Invalid credentials");
+        console.error(err);
+      }
     },
   },
 };

@@ -19,6 +19,8 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   data() {
     return {
@@ -28,8 +30,25 @@ export default {
     };
   },
   methods: {
-    register() {
-      console.log(this.name, this.email, this.password);
+    async register() {
+      try {
+        const res = await axios.post("http://localhost:3000/auth/signup", {
+          name: this.name,
+          email: this.email,
+          password: this.password,
+        });
+
+        console.log(res.data);
+
+        alert("Account created successfully");
+
+        // redirection vers login
+        this.$router.push("/");
+
+      } catch (err) {
+        console.error(err);
+        alert("Error during registration");
+      }
     },
   },
 };
