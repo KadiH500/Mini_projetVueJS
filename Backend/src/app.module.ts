@@ -22,11 +22,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        type: 'mysql',
+        type: 'postgres',
         host: configService.get<string>('DB_HOST', '127.0.0.1'),
-        port: Number(configService.get<string>('DB_PORT', '3306')),
-        username: configService.get<string>('DB_USER', 'root'),
-        password: configService.get<string>('DB_PASSWORD', 'root'),
+        port: Number(configService.get<string>('DB_PORT', '5432')),
+        username: configService.get<string>('DB_USER', 'postgres'),
+        password: configService.get<string>('DB_PASSWORD', '0000'),
         database: configService.get<string>('DB_NAME', 'isids26'),
         autoLoadEntities: true,
         synchronize: configService.get<string>('DB_SYNC', 'true') === 'true',

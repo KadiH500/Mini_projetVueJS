@@ -6,6 +6,9 @@ export class UserEntity {
   @PrimaryGeneratedColumn()
   id;
 
+  @Column({ nullable: true })
+  name: string;
+
   @Column({
     unique: true,
   })
@@ -21,13 +24,11 @@ export class UserEntity {
 
   @Column()
   salt: string;
-  
+
   @Column({
-    type : "enum",
-    enum : Roles,
-    default : Roles.ROLE_USER
+    type: 'enum',
+    enum: Roles,
+    default: Roles.ROLE_USER,
   })
-  role ;
-  
-  
+  role;
 }
