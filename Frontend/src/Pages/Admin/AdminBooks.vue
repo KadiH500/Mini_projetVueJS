@@ -36,15 +36,19 @@
             <td>{{ book.price }} TND</td>
             <td>{{ book.year }}</td>
             <td class="actions-col">
-              <button class="action-btn edit" @click="openEditModal(book)" title="Edit">✎</button>
-              <button class="action-btn delete" @click="deleteBook(book.id)" title="Delete">🗑</button>
+              <button class="action-btn edit" @click="openEditModal(book)" title="Edit">
+                <AppIcon name="edit" :size="16" />
+              </button>
+              <button class="action-btn delete" @click="confirmDelete(book)" title="Delete">
+                <AppIcon name="trash" :size="16" />
+              </button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- Modal -->
+    <!-- Edit/Create Modal -->
     <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
       <div class="modal-content">
         <div class="modal-header">
@@ -54,31 +58,31 @@
         <form @submit.prevent="submitForm" class="modal-body">
           <div class="form-group">
             <label>Title</label>
-            <input v-model="form.title" type="text" required />
+            <input v-model="form.title" type="text" required placeholder="Enter book title" />
           </div>
           <div class="form-row">
             <div class="form-group">
               <label>Category</label>
-              <input v-model="form.category" type="text" required />
+              <input v-model="form.category" type="text" required placeholder="e.g. Fiction" />
             </div>
             <div class="form-group">
-              <label>Price</label>
-              <input v-model="form.price" type="number" step="0.01" required />
+              <label>Price (TND)</label>
+              <input v-model="form.price" type="number" step="0.01" min="0" required />
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
               <label>Year</label>
-              <input v-model="form.year" type="number" required />
+              <input v-model="form.year" type="number" :max="new Date().getFullYear()" required />
             </div>
             <div class="form-group">
               <label>Editor</label>
-              <input v-model="form.editor" type="text" required />
+              <input v-model="form.editor" type="text" required placeholder="Publisher name" />
             </div>
           </div>
           <div class="form-group">
             <label>Image URL</label>
-            <input v-model="form.image" type="url" />
+            <input v-model="form.image" type="url" placeholder="https://example.com/cover.jpg" />
           </div>
           <div class="modal-footer">
             <button type="button" class="btn-ghost" @click="closeModal">Cancel</button>
@@ -89,18 +93,35 @@
         </form>
       </div>
     </div>
+
+    <!-- Confirmation Modal -->
+    <ConfirmationModal
+      :show="showDeleteModal"
+      title="Delete Book"
+      :message="`Are you sure you want to delete '${bookToDelete?.title}'? This will remove it from the catalog permanently.`"
+      confirmText="Delete Book"
+      :loading="deleting"
+      @confirm="handleDelete"
+      @cancel="showDeleteModal = false"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { adminGetBooks, adminCreateBook, adminUpdateBook, adminDeleteBook } from '../../api/admin'
+import ConfirmationModal from '../../components/ui/ConfirmationModal.vue'
+import AppIcon from '../../components/ui/AppIcon.vue'
 
 const books = ref([])
 const loading = ref(true)
 const showModal = ref(false)
 const isEditing = ref(false)
 const saving = ref(false)
+
+const showDeleteModal = ref(false)
+const deleting = ref(false)
+const bookToDelete = ref(null)
 
 const form = reactive({
   id: null,
@@ -186,14 +207,24 @@ async function submitForm() {
   }
 }
 
-async function deleteBook(id) {
-  if (!confirm('Are you sure you want to delete this book?')) return
+function confirmDelete(book) {
+  bookToDelete.value = book
+  showDeleteModal.value = true
+}
+
+async function handleDelete() {
+  if (!bookToDelete.value) return
+  deleting.value = true
   try {
-    await adminDeleteBook(id)
+    await adminDeleteBook(bookToDelete.value.id)
+    showDeleteModal.value = false
+    bookToDelete.value = null
     await fetchBooks()
   } catch (err) {
     console.error('Failed to delete book', err)
     alert('An error occurred while deleting the book.')
+  } finally {
+    deleting.value = false
   }
 }
 </script>

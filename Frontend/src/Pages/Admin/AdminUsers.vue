@@ -34,25 +34,36 @@
             </td>
             <td class="actions-col">
               <button 
-                class="btn-ghost small" 
+                class="btn-ghost small flex-btn" 
                 @click="toggleRole(user)"
                 :disabled="user.id === currentUserId"
               >
-                Make {{ user.role === 'ROLE_ADMIN' || user.role === 'admin' ? 'User' : 'Admin' }}
+                <AppIcon :name="user.role === 'ROLE_ADMIN' || user.role === 'admin' ? 'users' : 'users'" :size="14" />
+                <span>Make {{ user.role === 'ROLE_ADMIN' || user.role === 'admin' ? 'User' : 'Admin' }}</span>
               </button>
               <button 
                 class="action-btn delete" 
-                @click="deleteUser(user.id)" 
+                @click="confirmDelete(user)" 
                 title="Delete User"
                 :disabled="user.id === currentUserId"
               >
-                🗑
+                <AppIcon name="trash" :size="18" />
               </button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
+
+    <ConfirmationModal
+      :show="showDeleteModal"
+      title="Delete User"
+      :message="`Are you sure you want to delete ${userToDelete?.username}? This action cannot be undone.`"
+      confirmText="Delete User"
+      :loading="deleting"
+      @confirm="handleDelete"
+      @cancel="showDeleteModal = false"
+    />
   </div>
 </template>
 
@@ -60,9 +71,14 @@
 import { ref, onMounted, computed } from 'vue'
 import { adminGetUsers, adminUpdateUserRole, adminDeleteUser } from '../../api/admin'
 import { useAuthStore } from '../../Store/UseAuthStore'
+import ConfirmationModal from '../../components/ui/ConfirmationModal.vue'
+import AppIcon from '../../components/ui/AppIcon.vue'
 
 const users = ref([])
 const loading = ref(true)
+const deleting = ref(false)
+const showDeleteModal = ref(false)
+const userToDelete = ref(null)
 const authStore = useAuthStore()
 
 const currentUserId = computed(() => authStore.user?.id)
@@ -92,14 +108,25 @@ async function toggleRole(user) {
   }
 }
 
-async function deleteUser(id) {
-  if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) return
+function confirmDelete(user) {
+  userToDelete.value = user
+  showDeleteModal.value = true
+}
+
+async function handleDelete() {
+  if (!userToDelete.value) return
+  
+  deleting.value = true
   try {
-    await adminDeleteUser(id)
+    await adminDeleteUser(userToDelete.value.id)
+    showDeleteModal.value = false
+    userToDelete.value = null
     await fetchUsers()
   } catch (err) {
     console.error('Failed to delete user', err)
     alert('An error occurred while deleting the user.')
+  } finally {
+    deleting.value = false
   }
 }
 </script>
@@ -185,6 +212,12 @@ async function deleteUser(id) {
 .btn-ghost.small {
   padding: 6px 12px;
   font-size: 11px;
+}
+
+.flex-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .action-btn {

@@ -1,6 +1,6 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from './entities/user.entity';
@@ -15,16 +15,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configSer.get('SECRET_KEY')
+      secretOrKey: configSer.get<string>('JWT_SECRET', 'supersecretcode')
     });
   }
 
   async validate(payload: any) {
-    console.log(payload);
     let u = await this.userRepo.findOne({ where: { id: payload.id } });
-    console.log(u);
-    
-
+    if (!u) {
+      throw new UnauthorizedException('Invalid token');
+    }
     return { userRole: u.role, userId : u.id };
   }
 }

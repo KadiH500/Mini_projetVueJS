@@ -3,114 +3,158 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-logo">
-        <span>📚</span>
+        <AppIcon name="book" :size="24" />
         <strong>Libraria</strong>
       </div>
       <nav class="sidebar-nav">
-        <router-link to="/user-dashboard" class="nav-item active" id="nav-dashboard">
-          <span>🏠</span> Dashboard
+        <router-link to="/user-dashboard" class="nav-item active">
+          <AppIcon name="home" :size="20" /> Dashboard
         </router-link>
-        <router-link to="/" class="nav-item" id="nav-browse">
-          <span>📖</span> Browse Books
+        <router-link to="/" class="nav-item">
+          <AppIcon name="book" :size="20" /> Browse Books
         </router-link>
-        <router-link to="/cart" class="nav-item" id="nav-cart">
-          <span>🛒</span> My Cart
+        <router-link to="/cart" class="nav-item">
+          <AppIcon name="cart" :size="20" /> My Cart
         </router-link>
       </nav>
       <div class="sidebar-footer">
-        <div class="user-chip">
-          <div class="user-avatar">{{ initials }}</div>
-          <div class="user-meta">
-            <p class="u-name">{{ authStore.userName }}</p>
-            <p class="u-role">User Account</p>
+        <div class="user-profile">
+          <div class="avatar">{{ initials }}</div>
+          <div class="user-details">
+            <p class="name">{{ authStore.userName }}</p>
+            <p class="role">Reader</p>
           </div>
         </div>
-        <button class="logout-btn" id="btn-user-logout" @click="handleLogout">
-          <span>🚪</span> Sign Out
+        <button class="logout-btn" @click="handleLogout">
+          <AppIcon name="logout" :size="18" /> Sign Out
         </button>
       </div>
     </aside>
 
-    <!-- Main -->
+    <!-- Main Content -->
     <main class="main-content">
-      <!-- Header -->
-      <header class="top-bar">
-        <div>
-          <h1 class="greeting">Welcome back, <span class="highlight">{{ authStore.userName }}</span> 👋</h1>
-          <p class="subtext">Here's what's available for you today.</p>
-        </div>
-        <div class="role-badge user-badge">👤 User</div>
-      </header>
-
-      <!-- Stats row -->
-      <div class="stats-row">
-        <div class="stat-card" v-for="stat in stats" :key="stat.label">
-          <div class="stat-icon">{{ stat.icon }}</div>
-          <div>
-            <p class="stat-val">{{ stat.value }}</p>
-            <p class="stat-lbl">{{ stat.label }}</p>
+      <div class="content-container">
+        <!-- Header -->
+        <header class="header-section fade-in">
+          <div class="welcome-text">
+            <h1 class="title">Welcome back, <span class="accent">{{ authStore.userName }}</span> 👋</h1>
+            <p class="subtitle">Your literary journey continues here.</p>
           </div>
-        </div>
-      </div>
+          <div class="user-badge">
+            <AppIcon name="user" :size="16" />
+            Member Account
+          </div>
+        </header>
 
-      <!-- Quick actions -->
-      <section class="section">
-        <h2 class="section-title">Quick Actions</h2>
-        <div class="actions-grid">
-          <router-link to="/" class="action-card" id="action-browse">
-            <div class="action-icon">📚</div>
-            <h3>Browse Library</h3>
-            <p>Explore our full collection of books across all genres.</p>
-            <span class="action-arrow">→</span>
-          </router-link>
-
-          <router-link to="/cart" class="action-card" id="action-cart">
-            <div class="action-icon">🛒</div>
-            <h3>My Cart</h3>
-            <p>Review the books you've added and manage your selections.</p>
-            <span class="action-arrow">→</span>
-          </router-link>
-
-          <div class="action-card info-card" id="action-profile">
-            <div class="action-icon">👤</div>
-            <h3>Account Info</h3>
-            <div class="profile-info">
-              <div class="info-row"><span class="info-lbl">Name</span><span class="info-val">{{ authStore.user?.name || '—' }}</span></div>
-              <div class="info-row"><span class="info-lbl">Email</span><span class="info-val">{{ authStore.user?.email }}</span></div>
-              <div class="info-row"><span class="info-lbl">Username</span><span class="info-val">@{{ authStore.user?.username }}</span></div>
-              <div class="info-row"><span class="info-lbl">Role</span><span class="info-val role-pill">User</span></div>
+        <!-- Stats Row -->
+        <div class="stats-grid">
+          <div 
+            v-for="(stat, index) in stats" 
+            :key="stat.label" 
+            class="stat-card fade-in" 
+            :style="{ animationDelay: `${index * 0.1}s` }"
+          >
+            <div class="stat-icon-wrap"><AppIcon :name="stat.icon" :size="24" /></div>
+            <div class="stat-content">
+              <p class="stat-value">{{ stat.value }}</p>
+              <p class="stat-label">{{ stat.label }}</p>
             </div>
           </div>
         </div>
-      </section>
 
-      <!-- Access notice -->
-      <div class="notice">
-        <span class="notice-icon">ℹ️</span>
-        <p>Your account has <strong>User</strong> level access. You can browse books and manage your cart. For admin features, contact a system administrator.</p>
+        <!-- Quick Actions -->
+        <section class="actions-section fade-in" style="animation-delay: 0.3s">
+          <h2 class="section-heading">Quick Actions</h2>
+          <div class="actions-grid">
+            <router-link to="/" class="action-card">
+              <div class="action-icon">📖</div>
+              <div class="action-info">
+                <h3>Browse Library</h3>
+                <p>Discover your next favorite book from our curated collection.</p>
+              </div>
+              <span class="arrow">→</span>
+            </router-link>
+
+            <router-link to="/cart" class="action-card">
+              <div class="action-icon">🛒</div>
+              <div class="action-info">
+                <h3>My Cart</h3>
+                <p>View and manage the books you've selected for checkout.</p>
+              </div>
+              <span class="arrow">→</span>
+            </router-link>
+
+            <div class="action-card profile-card">
+              <div class="action-icon">👤</div>
+              <div class="action-info">
+                <h3>Account Details</h3>
+                <div class="info-list">
+                  <div class="info-item">
+                    <span class="label">Email</span>
+                    <span class="value">{{ authStore.user?.email }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="label">Username</span>
+                    <span class="value">@{{ authStore.user?.username }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Notice -->
+        <div class="notice-card fade-in" style="animation-delay: 0.5s">
+          <div class="notice-icon">✨</div>
+          <div class="notice-text">
+            <p><strong>Exclusive Access:</strong> As a registered reader, you have access to personalized recommendations and priority cart management.</p>
+          </div>
+        </div>
       </div>
     </main>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../Store/UseAuthStore'
+import { UseCartStore } from '../Store/UseCartStore'
+import { adminGetBooks } from '../api/admin'
+import AppIcon from '../components/ui/AppIcon.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const cartStore = UseCartStore()
+
+const totalBooks = ref(0)
+const loadingStats = ref(true)
 
 const initials = computed(() => {
-  const name = authStore.userName
+  const name = authStore.userName || 'User'
   return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
 })
 
-const stats = [
-  { icon: '📖', value: '500+', label: 'Books Available' },
-  { icon: '🛒', value: '0',    label: 'Items in Cart' },
-  { icon: '⭐', value: '4.8',  label: 'Avg. Rating' },
-]
+const stats = computed(() => [
+  { icon: 'book', value: loadingStats.value ? '...' : totalBooks.value, label: 'Books Available' },
+  { icon: 'cart', value: cartStore.cartCount,     label: 'Books in Cart' },
+  { icon: 'star', value: '4.9',   label: 'Reader Rating' },
+])
+
+onMounted(async () => {
+  loadingStats.value = true
+  try {
+    const [booksRes] = await Promise.all([
+      adminGetBooks(),
+      cartStore.fetchCart()
+    ])
+    totalBooks.value = booksRes.data?.length || 0
+  } catch (err) {
+    console.error('Failed to load dashboard data', err)
+  } finally {
+    loadingStats.value = false
+  }
+})
 
 function handleLogout() {
   authStore.logout()
@@ -119,215 +163,379 @@ function handleLogout() {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
-* { box-sizing: border-box; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 .user-page {
   display: flex;
   min-height: 100vh;
-  background: #0f0f1e;
+  background: #faf6ef; /* Cream background from Home.vue */
+  color: #1a1208; /* Ink from Home.vue */
   font-family: 'Inter', sans-serif;
-  color: #e2e8f0;
 }
 
 /* ── Sidebar ─────────────────────────────────────────────────── */
 .sidebar {
-  width: 240px;
-  background: rgba(255,255,255,0.04);
-  border-right: 1px solid rgba(255,255,255,0.08);
+  width: 280px;
+  background: #1a1208;
+  color: #c2a87a; /* Gold */
   display: flex;
   flex-direction: column;
-  padding: 24px 16px;
+  padding: 32px 20px;
   position: fixed;
   top: 0; left: 0; bottom: 0;
+  z-index: 100;
+  box-shadow: 4px 0 24px rgba(26, 18, 8, 0.15);
 }
+
 .sidebar-logo {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 20px;
+  gap: 12px;
+  font-size: 24px;
   font-weight: 700;
-  color: #fff;
-  margin-bottom: 40px;
-  padding: 0 8px;
+  margin-bottom: 48px;
+  padding: 0 12px;
+  color: #c2a87a;
 }
-.sidebar-logo span { font-size: 24px; }
 
-.sidebar-nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 11px 12px;
-  border-radius: 10px;
-  color: rgba(255,255,255,0.5);
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  color: #8c7b6a;
   text-decoration: none;
-  font-size: 14px;
   font-weight: 500;
-  transition: all 0.2s;
-}
-.nav-item:hover, .nav-item.active {
-  background: rgba(108,71,255,0.18);
-  color: #c4b5fd;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.sidebar-footer { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px; }
-.user-chip {
+.nav-item:hover {
+  background: rgba(194, 168, 122, 0.1);
+  color: #d4bc92;
+  transform: translateX(4px);
+}
+
+.nav-item.active {
+  background: #c2a87a;
+  color: #1a1208;
+  font-weight: 600;
+}
+
+.sidebar-footer {
+  border-top: 1px solid rgba(140, 123, 106, 0.2);
+  padding-top: 24px;
+}
+
+.user-profile {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   padding: 12px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 12px;
-  margin-bottom: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  margin-bottom: 16px;
 }
-.user-avatar {
-  width: 36px; height: 36px;
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  background: #c2a87a;
+  color: #1a1208;
   border-radius: 50%;
-  background: linear-gradient(135deg, #6c47ff, #a855f7);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 13px; font-weight: 700; color: #fff;
-  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
 }
-.user-meta { min-width: 0; }
-.u-name { margin: 0; font-size: 13px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.u-role { margin: 2px 0 0; font-size: 11px; color: rgba(255,255,255,0.35); }
+
+.user-details .name {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.user-details .role {
+  margin: 0;
+  font-size: 12px;
+  color: #8c7b6a;
+}
 
 .logout-btn {
   width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: 1px solid rgba(185, 64, 48, 0.3);
+  border-radius: 12px;
+  color: #f87171;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 10px 12px;
-  background: none;
-  border: 1px solid rgba(248,113,113,0.25);
-  border-radius: 10px;
-  color: #f87171;
-  font-family: 'Inter', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
   transition: all 0.2s;
 }
-.logout-btn:hover { background: rgba(248,113,113,0.1); border-color: #f87171; }
 
-/* ── Main ─────────────────────────────────────────────────────── */
-.main-content {
-  flex: 1;
-  margin-left: 240px;
-  padding: 36px 40px;
-  max-width: calc(100vw - 240px);
+.logout-btn:hover {
+  background: rgba(185, 64, 48, 0.1);
+  border-color: #f87171;
 }
 
-/* Header */
-.top-bar {
+/* ── Main Content ─────────────────────────────────────────────── */
+.main-content {
+  flex: 1;
+  margin-left: 280px;
+  padding: 48px;
+}
+
+.content-container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.header-section {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 32px;
+  margin-bottom: 48px;
 }
-.greeting { font-size: 26px; font-weight: 700; color: #fff; margin: 0 0 4px; }
-.highlight {
-  background: linear-gradient(135deg, #a78bfa, #f472b6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+
+.title {
+  font-family: 'Georgia', serif;
+  font-size: 32px;
+  color: #1a1208;
+  margin: 0 0 8px;
 }
-.subtext { margin: 0; color: rgba(255,255,255,0.4); font-size: 14px; }
-.role-badge {
-  padding: 6px 16px;
-  border-radius: 99px;
+
+.accent {
+  color: #7c5533;
+  font-style: italic;
+}
+
+.subtitle {
+  color: #8c7b6a;
+  font-size: 16px;
+}
+
+.user-badge {
+  background: #fff;
+  border: 1.5px solid #e8ddc8;
+  padding: 8px 20px;
+  border-radius: 30px;
   font-size: 13px;
   font-weight: 600;
-  flex-shrink: 0;
-}
-.user-badge { background: rgba(108,71,255,0.2); color: #a78bfa; border: 1px solid rgba(108,71,255,0.35); }
-
-/* Stats */
-.stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 40px; }
-.stat-card {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 22px 20px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 16px;
-  transition: border-color 0.2s;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(26, 18, 8, 0.05);
 }
-.stat-card:hover { border-color: rgba(167,139,250,0.4); }
-.stat-icon { font-size: 28px; }
-.stat-val { margin: 0; font-size: 24px; font-weight: 700; color: #fff; }
-.stat-lbl { margin: 2px 0 0; font-size: 12px; color: rgba(255,255,255,0.4); }
 
-/* Section */
-.section-title { font-size: 16px; font-weight: 600; color: rgba(255,255,255,0.7); margin: 0 0 16px; letter-spacing: 0.5px; }
+/* Stats */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 48px;
+}
 
-/* Actions grid */
-.actions-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 32px; }
-.action-card {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
+.stat-card {
+  background: #fff;
+  border: 1.5px solid #e8ddc8;
+  border-radius: 20px;
+  padding: 28px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  border-color: #c2a87a;
+  box-shadow: 0 12px 24px rgba(26, 18, 8, 0.08);
+}
+
+.stat-icon-wrap {
+  width: 56px;
+  height: 56px;
+  background: #faf6ef;
   border-radius: 16px;
-  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}
+
+.stat-value {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1208;
+}
+
+.stat-label {
+  margin: 0;
+  font-size: 13px;
+  color: #8c7b6a;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+
+/* Actions */
+.section-heading {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1208;
+  margin-bottom: 24px;
+  padding-left: 4px;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 48px;
+}
+
+.action-card {
+  background: #fff;
+  border: 1.5px solid #e8ddc8;
+  border-radius: 24px;
+  padding: 32px;
   text-decoration: none;
   color: inherit;
-  transition: all 0.25s;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
-  overflow: hidden;
 }
-.action-card:hover {
-  border-color: rgba(167,139,250,0.45);
-  background: rgba(108,71,255,0.1);
-  transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(108,71,255,0.2);
-}
-.action-icon { font-size: 32px; margin-bottom: 12px; }
-.action-card h3 { margin: 0 0 6px; font-size: 15px; font-weight: 600; color: #fff; }
-.action-card p  { margin: 0; font-size: 13px; color: rgba(255,255,255,0.4); line-height: 1.5; }
-.action-arrow {
-  position: absolute;
-  bottom: 20px; right: 20px;
-  color: rgba(167,139,250,0.6);
-  font-size: 18px;
-  transition: transform 0.2s;
-}
-.action-card:hover .action-arrow { transform: translateX(4px); }
-.info-card { cursor: default; }
-.info-card:hover { transform: none; }
 
-/* Profile info */
-.profile-info { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
-.info-row { display: flex; justify-content: space-between; align-items: center; }
-.info-lbl { font-size: 11px; color: rgba(255,255,255,0.35); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
-.info-val { font-size: 13px; color: rgba(255,255,255,0.8); font-weight: 500; }
-.role-pill {
-  background: rgba(108,71,255,0.2);
-  color: #a78bfa;
-  padding: 2px 10px;
-  border-radius: 99px;
+.action-card:hover {
+  background: #1a1208;
+  border-color: #1a1208;
+  color: #c2a87a;
+}
+
+.action-icon {
+  font-size: 40px;
+  margin-bottom: 20px;
+}
+
+.action-card h3 {
+  margin: 0 0 12px;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: 'Georgia', serif;
+}
+
+.action-card p {
+  margin: 0;
+  font-size: 14px;
+  color: #8c7b6a;
+  line-height: 1.6;
+}
+
+.action-card:hover p {
+  color: rgba(194, 168, 122, 0.7);
+}
+
+.arrow {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  font-size: 20px;
+  opacity: 0;
+  transition: all 0.3s;
+}
+
+.action-card:hover .arrow {
+  opacity: 1;
+  transform: translateX(8px);
+}
+
+.profile-card { cursor: default; }
+.profile-card:hover { background: #fff; border-color: #e8ddc8; color: inherit; }
+
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-item .label {
   font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #8c7b6a;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.info-item .value {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1208;
 }
 
 /* Notice */
-.notice {
+.notice-card {
+  background: #f7efe3;
+  border: 1px dashed #c2a87a;
+  border-radius: 20px;
+  padding: 24px;
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  background: rgba(251,191,36,0.08);
-  border: 1px solid rgba(251,191,36,0.25);
-  border-radius: 12px;
-  padding: 16px 20px;
+  gap: 16px;
+  align-items: center;
 }
-.notice-icon { font-size: 20px; flex-shrink: 0; }
-.notice p { margin: 0; font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.6; }
-.notice strong { color: rgba(251,191,36,0.9); }
+
+.notice-icon {
+  font-size: 24px;
+}
+
+.notice-text p {
+  margin: 0;
+  font-size: 14px;
+  color: #7c5533;
+  line-height: 1.6;
+}
+
+/* Animations */
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.8s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
 /* Responsive */
-@media (max-width: 900px) {
-  .sidebar { display: none; }
-  .main-content { margin-left: 0; max-width: 100%; padding: 24px 20px; }
-  .stats-row, .actions-grid { grid-template-columns: 1fr; }
+@media (max-width: 1024px) {
+  .stats-grid, .actions-grid { grid-template-columns: 1fr; }
+  .sidebar { width: 80px; padding: 20px 10px; }
+  .sidebar-logo strong, .nav-item span:not(.nav-icon), .user-details, .logout-btn span:not(:first-child) { display: none; }
+  .main-content { margin-left: 80px; padding: 32px; }
+}
+
+@media (max-width: 640px) {
+  .header-section { flex-direction: column; gap: 20px; }
+  .main-content { padding: 24px; }
 }
 </style>

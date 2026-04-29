@@ -1,5 +1,6 @@
 <template>
   <div class="home">
+    <a href="#books" class="skip-link">Skip to books</a>
 
     <!-- ══════════════════ NAVBAR ══════════════════ -->
     <nav class="navbar">
@@ -7,7 +8,7 @@
 
         <!-- Logo -->
         <router-link to="/" class="logo">
-          <span class="logo-icon">⬡</span>
+          <span class="logo-icon"><AppIcon name="book" :size="22" /></span>
           Libraria
         </router-link>
 
@@ -21,9 +22,16 @@
         <!-- Right actions -->
         <div class="nav-actions">
           <!-- Wishlist -->
-          <button class="icon-btn" @click="showWishlist = !showWishlist" title="Wishlist">
+          <button
+            class="icon-btn"
+            @click="showWishlist = !showWishlist"
+            title="Wishlist"
+            :aria-expanded="showWishlist"
+            aria-controls="wishlist-drawer"
+            aria-label="Toggle wishlist drawer"
+          >
             <span class="icon-btn-inner">
-              {{ wishlist.length > 0 ? '♥' : '♡' }}
+              <AppIcon name="heart" :filled="wishlist.length > 0" :size="20" />
               <span v-if="wishlist.length > 0" class="icon-badge">{{ wishlist.length }}</span>
             </span>
           </button>
@@ -31,7 +39,7 @@
           <!-- Cart -->
           <router-link to="/cart" class="icon-btn" title="Cart">
             <span class="icon-btn-inner">
-              🛒
+              <AppIcon name="cart" :size="20" />
               <span v-if="cartStore.cartCount > 0" class="icon-badge cart-badge">
                 {{ cartStore.cartCount }}
               </span>
@@ -49,13 +57,18 @@
 
     <!-- ══════════════════ WISHLIST DRAWER ══════════════════ -->
     <Transition name="drawer">
-      <div v-if="showWishlist" class="wishlist-drawer">
+      <div v-if="showWishlist" id="wishlist-drawer" class="wishlist-drawer">
         <div class="drawer-header">
-          <h3>♥ My Wishlist</h3>
-          <button class="close-btn" @click="showWishlist = false">✕</button>
+          <h3 class="drawer-title">
+            <AppIcon name="heart" :filled="true" :size="16" />
+            My Wishlist
+          </h3>
+          <button class="close-btn" @click="showWishlist = false">
+            <AppIcon name="close" :size="14" />
+          </button>
         </div>
         <div v-if="wishlist.length === 0" class="drawer-empty">
-          No books saved yet.<br/>Click ♡ on any book to save it.
+          No books saved yet.<br/>Use the wishlist button on a book to save it.
         </div>
         <div v-else class="drawer-list">
           <div v-for="book in wishlist" :key="book.id" class="drawer-item">
@@ -66,7 +79,9 @@
               <p class="drawer-item-price">{{ book.price }} TND</p>
             </div>
             <button class="drawer-add" @click="moveToCart(book)">Add to cart</button>
-            <button class="drawer-remove" @click="removeFromWishlist(book.id)">✕</button>
+            <button class="drawer-remove" @click="removeFromWishlist(book.id)">
+              <AppIcon name="close" :size="12" />
+            </button>
           </div>
         </div>
       </div>
@@ -93,20 +108,49 @@
     <section class="search-section" id="books">
       <div class="search-inner">
         <div class="search-wrap">
-          <span class="search-icon">🔍</span>
+          <span class="search-icon"><AppIcon name="search" :size="16" /></span>
           <input
             v-model="search"
             placeholder="Search by title or author…"
             class="search-input"
           />
-          <button v-if="search" class="search-clear" @click="search = ''">✕</button>
+          <button v-if="search" class="search-clear" @click="search = ''">
+            <AppIcon name="close" :size="12" />
+          </button>
         </div>
-        <select v-model="sortBy" class="sort-select">
-          <option value="default">Sort: Default</option>
-          <option value="price-asc">Price: Low → High</option>
-          <option value="price-desc">Price: High → Low</option>
-          <option value="title-asc">Title: A → Z</option>
-        </select>
+        <div class="sort-control">
+          <span class="sort-label">Sort by</span>
+          <button
+            ref="sortTriggerRef"
+            class="sort-trigger"
+            type="button"
+            @click="toggleSortMenu"
+            :aria-expanded="sortMenuOpen"
+            aria-haspopup="listbox"
+            aria-label="Sort books"
+          >
+            <span class="sort-trigger-text">{{ currentSortLabel }}</span>
+            <span class="sort-caret" :class="{ open: sortMenuOpen }" aria-hidden="true">
+              <AppIcon name="chevron-down" :size="16" />
+            </span>
+          </button>
+
+          <Transition name="sort-menu">
+            <ul v-if="sortMenuOpen" class="sort-menu" role="listbox" aria-label="Sort options">
+              <li v-for="option in sortOptions" :key="option.value">
+                <button
+                  type="button"
+                  class="sort-option"
+                  :class="{ active: sortBy === option.value }"
+                  @click="selectSort(option.value)"
+                >
+                  <span>{{ option.label }}</span>
+                  <AppIcon v-if="sortBy === option.value" name="check" :size="14" />
+                </button>
+              </li>
+            </ul>
+          </Transition>
+        </div>
       </div>
     </section>
 
@@ -115,37 +159,39 @@
       <div class="categories-inner">
         <button
           v-for="cat in allCategories"
-          :key="cat.name"
+          :key="cat"
           class="cat-pill"
-          :class="{ active: selectedCategory === cat.name }"
-          @click="selectedCategory = cat.name"
+          :class="{ active: selectedCategory === cat }"
+          @click="selectedCategory = cat"
         >
-          <span class="cat-icon">{{ cat.icon }}</span>
-          {{ cat.name }}
+          {{ cat }}
         </button>
       </div>
-
-      <!-- Category quote -->
-      <Transition name="fade" mode="out-in">
-        <div class="cat-quote" :key="selectedCategory">
-          <p class="quote-text">"{{ currentQuote.text }}"</p>
-          <p class="quote-author">— {{ currentQuote.author }}</p>
-        </div>
-      </Transition>
     </section>
 
     <!-- ══════════════════ BOOKS GRID ══════════════════ -->
     <main class="books-section">
 
       <!-- Loading -->
-      <div v-if="loading" class="state-box">
-        <div class="spinner"></div>
-        <p>Loading books…</p>
+      <div v-if="loading" class="books-skeleton" aria-label="Loading books">
+        <article v-for="n in 8" :key="n" class="skeleton-card">
+          <div class="skeleton-cover"></div>
+          <div class="skeleton-line skeleton-line-lg"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line skeleton-line-sm"></div>
+        </article>
+      </div>
+
+      <!-- Error -->
+      <div v-else-if="loadError" class="state-box">
+        <div class="state-icon"><AppIcon name="alert" :size="42" /></div>
+        <p>{{ loadError }}</p>
+        <button class="btn-primary" @click="fetchBooks">Retry</button>
       </div>
 
       <!-- No results -->
       <div v-else-if="filteredBooks.length === 0" class="state-box">
-        <p style="font-size:40px">📭</p>
+        <div class="state-icon"><AppIcon name="inbox" :size="42" /></div>
         <p>No books found for "<strong>{{ search }}</strong>"</p>
         <button class="btn-primary" @click="clearFilters">Clear filters</button>
       </div>
@@ -174,7 +220,7 @@
               @click.stop="toggleWishlist(book)"
               :title="isWishlisted(book.id) ? 'Remove from wishlist' : 'Add to wishlist'"
             >
-              {{ isWishlisted(book.id) ? '♥' : '♡' }}
+              <AppIcon name="heart" :filled="isWishlisted(book.id)" :size="16" />
             </button>
           </div>
 
@@ -189,31 +235,33 @@
               <span
                 v-for="s in 5" :key="s"
                 :class="['star', { filled: s <= Math.round(book.rating || 0) }]"
-              >★</span>
+              >
+                <AppIcon name="star" :filled="s <= Math.round(book.rating || 0)" :size="12" />
+              </span>
             </div>
 
             <div class="card-footer">
-              <span class="card-price">{{ book.price }} TND</span>
+              <span class="card-price">{{ formatPrice(book.price) }}</span>
               <button
                 class="add-btn"
                 :class="{ added: lastAdded === book.id }"
                 @click.stop="addToCart(book)"
               >
-                {{ lastAdded === book.id ? '✓' : '+' }}
+                <AppIcon :name="lastAdded === book.id ? 'check' : 'plus'" :size="16" />
               </button>
             </div>
           </div>
         </article>
       </div>
 
-      <p v-if="!loading && filteredBooks.length > 0" class="results-count">
-        {{ filteredBooks.length }} book{{ filteredBooks.length !== 1 ? 's' : '' }} found
+      <p v-if="!loading && filteredBooks.length > 0" class="results-count" aria-live="polite">
+        {{ resultsCountLabel }}
       </p>
     </main>
 
     <!-- ══════════════════ TOAST ══════════════════ -->
     <Transition name="toast">
-      <div v-if="toast" class="toast" :class="toast.type">
+      <div v-if="toast" class="toast" :class="toast.type" aria-live="polite">
         {{ toast.msg }}
       </div>
     </Transition>
@@ -222,119 +270,62 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
-import { getBooks } from '@/api/Book'
 import { UseCartStore } from '@/Store/UseCartStore'
+import AppIcon from '@/components/ui/AppIcon.vue'
+import { useBooksCatalog } from '@/composables/useBooksCatalog'
 
 const router    = useRouter()
 const cartStore = UseCartStore()
-
-// ── State ─────────────────────────────────────────────────────────
-const books            = ref([])
-const loading          = ref(true)
-const search           = ref('')
-const sortBy           = ref('default')
-const selectedCategory = ref('All')
 const wishlist         = ref([])
 const showWishlist     = ref(false)
 const lastAdded        = ref(null)
 const toast            = ref(null)
+const sortMenuOpen = ref(false)
+const sortTriggerRef = ref(null)
+const {
+  loading,
+  loadError,
+  search,
+  sortBy,
+  selectedCategory,
+  allCategories,
+  filteredBooks,
+  fetchBooks,
+  clearFilters,
+  placeholderImg,
+} = useBooksCatalog()
 
-// ── Categories with icons and quotes ─────────────────────────────
-const categoryData = [
-  {
-    name: 'All',
-    icon: '📚',
-    quote: { text: 'A reader lives a thousand lives before he dies.', author: 'George R.R. Martin' }
-  },
-  {
-    name: 'Fiction',
-    icon: '🌙',
-    quote: { text: 'Fiction is the lie through which we tell the truth.', author: 'Albert Camus' }
-  },
-  {
-    name: 'Sci-fi',
-    icon: '🚀',
-    quote: { text: 'The universe is under no obligation to make sense to you.', author: 'Neil deGrasse Tyson' }
-  },
-  {
-    name: 'Self-help',
-    icon: '🌱',
-    quote: { text: 'You do not rise to the level of your goals. You fall to the level of your systems.', author: 'James Clear' }
-  },
-  {
-    name: 'History',
-    icon: '🏛️',
-    quote: { text: 'The most effective way to destroy people is to deny and obliterate their own understanding of their history.', author: 'George Orwell' }
-  },
-  {
-    name: 'Business',
-    icon: '💼',
-    quote: { text: 'Innovation distinguishes between a leader and a follower.', author: 'Steve Jobs' }
-  },
-  {
-    name: 'Philosophy',
-    icon: '🪐',
-    quote: { text: 'The unexamined life is not worth living.', author: 'Socrates' }
-  },
-  {
-    name: 'Psychology',
-    icon: '🧠',
-    quote: { text: 'Everything can be taken from a man but one thing: the freedom to choose one\'s attitude.', author: 'Viktor Frankl' }
-  },
-]
-
-// ── Mock books ────────────────────────────────────────────────────
-const mockBooks = [
-  { id: 1, title: 'The Midnight Library', author: 'Matt Haig',         price: 28, category: 'Fiction',    rating: 4, isNew: true,  discount: 0,  image: '' },
-  { id: 2, title: 'Atomic Habits',        author: 'James Clear',       price: 32, category: 'Self-help',  rating: 5, isNew: false, discount: 10, image: '' },
-  { id: 3, title: 'Dune',                 author: 'Frank Herbert',     price: 25, category: 'Sci-fi',     rating: 5, isNew: false, discount: 0,  image: '' },
-  { id: 4, title: 'Sapiens',              author: 'Yuval Noah Harari', price: 35, category: 'History',    rating: 4, isNew: false, discount: 15, image: '' },
-  { id: 5, title: 'The Alchemist',        author: 'Paulo Coelho',      price: 22, category: 'Fiction',    rating: 4, isNew: false, discount: 0,  image: '' },
-  { id: 6, title: 'The Lean Startup',     author: 'Eric Ries',         price: 30, category: 'Business',   rating: 4, isNew: true,  discount: 0,  image: '' },
-  { id: 7, title: '1984',                 author: 'George Orwell',     price: 20, category: 'Fiction',    rating: 5, isNew: false, discount: 0,  image: '' },
-  { id: 8, title: 'Thinking Fast & Slow', author: 'Daniel Kahneman',  price: 34, category: 'Psychology', rating: 4, isNew: false, discount: 0,  image: '' },
-  { id: 9, title: 'Meditations',          author: 'Marcus Aurelius',   price: 18, category: 'Philosophy', rating: 5, isNew: false, discount: 0,  image: '' },
-  { id:10, title: 'Deep Work',            author: 'Cal Newport',       price: 27, category: 'Self-help',  rating: 4, isNew: false, discount: 5,  image: '' },
-]
-
-// ── Computed ──────────────────────────────────────────────────────
-const allCategories = computed(() => categoryData)
-
-const currentQuote = computed(() => {
-  const cat = categoryData.find(c => c.name === selectedCategory.value)
-  return cat ? cat.quote : categoryData[0].quote
+const currencyFormatter = new Intl.NumberFormat('fr-TN', {
+  style: 'currency',
+  currency: 'TND',
+  maximumFractionDigits: 2,
 })
 
-const filteredBooks = computed(() => {
-  let list = [...books.value]
-  if (selectedCategory.value !== 'All') {
-    list = list.filter(b => b.category === selectedCategory.value)
-  }
-  const q = search.value.toLowerCase().trim()
-  if (q) {
-    list = list.filter(b =>
-      b.title.toLowerCase().includes(q) ||
-      b.author.toLowerCase().includes(q)
-    )
-  }
-  if (sortBy.value === 'price-asc')  list.sort((a, b) => a.price - b.price)
-  if (sortBy.value === 'price-desc') list.sort((a, b) => b.price - a.price)
-  if (sortBy.value === 'title-asc')  list.sort((a, b) => a.title.localeCompare(b.title))
-  return list
+const resultsCountLabel = computed(() => {
+  const count = filteredBooks.value.length
+  return `${count} book${count !== 1 ? 's' : ''} found`
 })
 
-// ── Actions ───────────────────────────────────────────────────────
-onMounted(async () => {
-  try {
-    const res = await getBooks()
-    books.value = res.data
-  } catch {
-    books.value = mockBooks
-  } finally {
-    loading.value = false
-  }
+const sortOptions = [
+  { value: 'default', label: 'Default' },
+  { value: 'price-asc', label: 'Price: Low → High' },
+  { value: 'price-desc', label: 'Price: High → Low' },
+  { value: 'title-asc', label: 'Title: A → Z' },
+]
+
+const currentSortLabel = computed(() => {
+  const selected = sortOptions.find((option) => option.value === sortBy.value)
+  return selected?.label || 'Default'
+})
+
+onMounted(fetchBooks)
+onMounted(() => {
+  document.addEventListener('click', handleOutsideSortClick)
+})
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleOutsideSortClick)
 })
 
 function addToCart(book) {
@@ -369,25 +360,36 @@ function moveToCart(book) {
   showToast(`"${book.title}" moved to cart!`, 'success')
 }
 
-function clearFilters() {
-  search.value = ''
-  selectedCategory.value = 'All'
-  sortBy.value = 'default'
-}
-
 function goToBook(id)  { router.push(`/books/${id}`) }
 function goToLogin()   { router.push('/login') }
 function scrollToBooks() {
   document.getElementById('books')?.scrollIntoView({ behavior: 'smooth' })
 }
 
-function placeholderImg(title) {
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&size=200&background=2d2016&color=c2a87a&bold=true`
-}
-
 function showToast(msg, type = 'success') {
   toast.value = { msg, type }
   setTimeout(() => toast.value = null, 2500)
+}
+
+function formatPrice(price) {
+  return currencyFormatter.format(Number(price) || 0)
+}
+
+function toggleSortMenu() {
+  sortMenuOpen.value = !sortMenuOpen.value
+}
+
+function selectSort(value) {
+  sortBy.value = value
+  sortMenuOpen.value = false
+}
+
+function handleOutsideSortClick(event) {
+  if (!sortMenuOpen.value || !sortTriggerRef.value) return
+  const sortControl = sortTriggerRef.value.closest('.sort-control')
+  if (sortControl && !sortControl.contains(event.target)) {
+    sortMenuOpen.value = false
+  }
 }
 </script>
 
@@ -409,10 +411,29 @@ function showToast(msg, type = 'success') {
   font-family: 'Georgia', 'Times New Roman', serif;
 }
 
+.skip-link {
+  position: absolute;
+  left: 16px;
+  top: -50px;
+  z-index: 300;
+  background: #fff;
+  color: var(--ink);
+  border: 2px solid var(--gold);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: sans-serif;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: 12px;
+}
+
 /* ══ Navbar ══════════════════════════════════════════════════════════ */
 .navbar {
   position: sticky; top: 0; z-index: 200;
-  background: var(--ink);
+  background: rgba(26, 18, 8, 0.95);
+  backdrop-filter: blur(8px);
   border-bottom: 2px solid #2e2010;
 }
  
@@ -426,7 +447,11 @@ function showToast(msg, type = 'success') {
   color: var(--gold); text-decoration: none;
   font-size: 20px; font-weight: bold; letter-spacing: 1px;
 }
-.logo-icon { font-size: 22px; }
+.logo-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
 .nav-links { display: flex; gap: 28px; }
 .nav-link {
   color: #b8a898; text-decoration: none;
@@ -438,13 +463,30 @@ function showToast(msg, type = 'success') {
 
 .icon-btn {
   background: none; border: none; cursor: pointer;
-  color: #b8a898; font-size: 20px;
+  color: #b8a898;
   width: 40px; height: 40px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   transition: background .2s, color .2s;
   text-decoration: none; position: relative;
 }
 .icon-btn:hover { background: rgba(255,255,255,.08); color: var(--gold); }
+.icon-btn:focus-visible,
+.signin-btn:focus-visible,
+.search-input:focus-visible,
+.sort-trigger:focus-visible,
+.sort-option:focus-visible,
+.cat-pill:focus-visible,
+.btn-primary:focus-visible,
+.btn-ghost:focus-visible,
+.add-btn:focus-visible,
+.wish-btn:focus-visible,
+.drawer-add:focus-visible,
+.drawer-remove:focus-visible,
+.search-clear:focus-visible,
+.close-btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
 .icon-btn-inner { position: relative; display: flex; align-items: center; justify-content: center; }
 .icon-badge {
   position: absolute; top: -8px; right: -10px;
@@ -479,11 +521,21 @@ function showToast(msg, type = 'success') {
   padding: 20px 20px 16px;
   border-bottom: 1px solid var(--sand);
 }
-.drawer-header h3 { font-size: 17px; color: var(--ink); margin: 0; }
+.drawer-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 17px;
+  color: var(--ink);
+  margin: 0;
+}
 .close-btn {
   background: none; border: none; cursor: pointer;
-  font-size: 16px; color: var(--muted); padding: 4px 8px;
+  color: var(--muted); padding: 4px 8px;
   border-radius: 4px; transition: background .2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .close-btn:hover { background: var(--sand); }
 .drawer-empty {
@@ -527,7 +579,13 @@ function showToast(msg, type = 'success') {
 
 /* ══ Hero ═════════════════════════════════════════════════════════════ */
 .hero {
-  background: var(--ink);
+  background-color: var(--ink);
+  background-image:
+    linear-gradient(rgba(26, 18, 8, 0.78), rgba(26, 18, 8, 0.72)),
+    url('./pic/cover.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   min-height: 420px;
   display: flex; align-items: center;
   padding: 60px 28px;
@@ -588,6 +646,7 @@ function showToast(msg, type = 'success') {
   background: #fff;
   border-bottom: 1px solid var(--sand);
   position: sticky; top: 64px; z-index: 100;
+  box-shadow: 0 2px 12px rgba(26,18,8,.06);
 }
 .search-inner {
   max-width: 1200px; margin: 0 auto;
@@ -599,7 +658,9 @@ function showToast(msg, type = 'success') {
 }
 .search-icon {
   position: absolute; left: 14px; top: 50%;
-  transform: translateY(-50%); font-size: 16px; pointer-events: none;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
 }
 .search-input {
   width: 100%; padding: 11px 40px 11px 42px;
@@ -613,15 +674,111 @@ function showToast(msg, type = 'success') {
   position: absolute; right: 12px; top: 50%;
   transform: translateY(-50%);
   background: none; border: none; cursor: pointer;
-  color: var(--muted); font-size: 14px;
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
-.sort-select {
-  padding: 10px 14px; border: 2px solid var(--sand);
-  border-radius: 8px; font-family: sans-serif; font-size: 13px;
-  background: var(--cream); outline: none; cursor: pointer;
+.sort-control {
+  position: relative;
+  width: 220px;
+  min-width: 220px;
+}
+.sort-label {
+  position: absolute;
+  left: 14px;
+  top: -9px;
+  background: #fff;
+  color: var(--muted);
+  font-family: sans-serif;
+  font-size: 11px;
+  padding: 0 6px;
+  letter-spacing: .2px;
+  text-transform: uppercase;
+  z-index: 2;
+}
+.sort-trigger {
+  width: 100%;
+  padding: 12px 40px 12px 14px;
+  border: 2px solid var(--sand);
+  border-radius: 12px;
+  font-family: sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  background: #fff;
+  outline: none;
+  cursor: pointer;
   color: var(--ink);
+  transition: border-color .2s, box-shadow .2s, background-color .2s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
 }
-.sort-select:focus { border-color: var(--gold); }
+.sort-trigger:hover { border-color: #d4bc92; }
+.sort-trigger:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 4px rgba(194, 168, 122, 0.2);
+}
+.sort-trigger-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sort-caret {
+  color: var(--muted);
+  display: inline-flex;
+  transition: transform .2s ease;
+}
+.sort-caret.open {
+  transform: rotate(180deg);
+}
+.sort-menu {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 6px;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  background: #fff;
+  border: 1px solid var(--sand);
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgba(26,18,8,.12);
+}
+.sort-option {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  font-family: sans-serif;
+  font-size: 14px;
+  text-align: left;
+  padding: 10px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sort-option:hover {
+  background: #f7efe3;
+}
+.sort-option.active {
+  background: #f0e7d8;
+  color: #5d4428;
+  font-weight: 700;
+}
+.sort-menu-enter-active,
+.sort-menu-leave-active {
+  transition: opacity .18s ease, transform .18s ease;
+}
+.sort-menu-enter-from,
+.sort-menu-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
 
 /* ══ Categories ══════════════════════════════════════════════════════ */
 .categories-section {
@@ -671,12 +828,56 @@ function showToast(msg, type = 'success') {
   text-align: center; padding: 80px 20px;
   color: var(--muted); font-family: sans-serif;
 }
+.state-icon {
+  margin: 0 auto 12px;
+  width: fit-content;
+}
 .spinner {
   width: 36px; height: 36px; margin: 0 auto 16px;
   border: 3px solid var(--sand); border-top-color: var(--gold);
   border-radius: 50%; animation: spin .8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ══ Loading Skeleton ════════════════════════════════════════════════ */
+.books-skeleton {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 24px;
+}
+
+.skeleton-card {
+  border-radius: var(--r);
+  border: 1px solid var(--sand);
+  background: #fff;
+  padding: 12px;
+}
+
+.skeleton-cover {
+  aspect-ratio: 3 / 4;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  background: linear-gradient(90deg, #f0e7d8 25%, #f7efe3 50%, #f0e7d8 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+.skeleton-line {
+  height: 10px;
+  border-radius: 999px;
+  margin-bottom: 8px;
+  background: linear-gradient(90deg, #f0e7d8 25%, #f7efe3 50%, #f0e7d8 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+.skeleton-line-lg { width: 85%; }
+.skeleton-line-sm { width: 45%; margin-bottom: 0; }
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
 
 /* ══ Book Grid ═══════════════════════════════════════════════════════ */
 .book-grid {
@@ -691,6 +892,7 @@ function showToast(msg, type = 'success') {
   border: 1px solid var(--sand); overflow: hidden;
   cursor: pointer; transition: transform .25s, box-shadow .25s;
   display: flex; flex-direction: column;
+  box-shadow: 0 6px 18px rgba(26,18,8,.06);
 }
 .book-card:hover {
   transform: translateY(-6px);
@@ -720,7 +922,7 @@ function showToast(msg, type = 'success') {
   position: absolute; top: 8px; right: 8px;
   width: 32px; height: 32px; border-radius: 50%;
   background: rgba(255,255,255,.9); border: none;
-  font-size: 16px; cursor: pointer;
+  cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: transform .2s, background .2s; color: var(--muted);
 }
@@ -756,12 +958,12 @@ function showToast(msg, type = 'success') {
 .add-btn {
   width: 34px; height: 34px; border-radius: 50%;
   background: var(--ink); color: var(--gold);
-  border: none; font-size: 18px; cursor: pointer;
+  border: none; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: background .2s, transform .1s;
 }
 .add-btn:hover  { background: var(--brown); }
-.add-btn.added  { background: var(--green); color: #fff; font-size: 14px; }
+.add-btn.added  { background: var(--green); color: #fff; }
 .add-btn:active { transform: scale(.9); }
 
 .results-count {
@@ -800,9 +1002,18 @@ function showToast(msg, type = 'success') {
   .hero            { padding: 40px 20px; }
   .hero-title      { font-size: 38px; }
   .search-inner    { flex-direction: column; }
-  .sort-select     { width: 100%; }
+  .sort-control    { width: 100%; min-width: 0; }
   .wishlist-drawer { width: 100%; }
   .categories-section,
   .books-section   { padding-left: 16px; padding-right: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 </style>

@@ -3,19 +3,24 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-header">
-        <span class="logo-icon">B</span>
+        <div class="logo-icon">
+          <AppIcon name="book" :size="20" />
+        </div>
         <h2 class="logo-text">Admin Panel</h2>
       </div>
       
       <nav class="sidebar-nav">
         <router-link to="/admin" class="nav-item" exact-active-class="active">
-          Dashboard
+          <AppIcon name="home" :size="18" />
+          <span>Dashboard</span>
         </router-link>
         <router-link to="/admin/books" class="nav-item" active-class="active">
-          Books Management
+          <AppIcon name="book" :size="18" />
+          <span>Books Management</span>
         </router-link>
         <router-link to="/admin/users" class="nav-item" active-class="active">
-          Users Management
+          <AppIcon name="users" :size="18" />
+          <span>Users Management</span>
         </router-link>
       </nav>
 
@@ -24,7 +29,10 @@
           <span class="user-role">{{ authStore.user?.role }}</span>
           <span class="user-email">{{ authStore.user?.email }}</span>
         </div>
-        <button class="logout-btn" @click="handleLogout">Logout</button>
+        <button class="logout-btn" @click="handleLogout">
+          <AppIcon name="logout" :size="16" />
+          <span>Logout</span>
+        </button>
       </div>
     </aside>
 
@@ -38,6 +46,7 @@
 <script setup>
 import { useAuthStore } from '../../Store/UseAuthStore'
 import { useRouter } from 'vue-router'
+import AppIcon from '../../components/ui/AppIcon.vue'
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -113,6 +122,9 @@ function handleLogout() {
   border-radius: 8px;
   transition: all 0.2s;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .nav-item:hover {
@@ -170,6 +182,10 @@ function handleLogout() {
   font-weight: bold;
   cursor: pointer;
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .logout-btn:hover {
