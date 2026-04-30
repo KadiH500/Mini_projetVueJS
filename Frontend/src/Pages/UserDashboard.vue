@@ -37,7 +37,7 @@
         <!-- Header -->
         <header class="header-section fade-in">
           <div class="welcome-text">
-            <h1 class="title">Welcome back, <span class="accent">{{ authStore.userName }}</span> 👋</h1>
+            <h1 class="title">Welcome back, <span class="accent">{{ authStore.userName }}</span> </h1>
             <p class="subtitle">Your literary journey continues here.</p>
           </div>
           <div class="user-badge">
@@ -67,7 +67,7 @@
           <h2 class="section-heading">Quick Actions</h2>
           <div class="actions-grid">
             <router-link to="/" class="action-card">
-              <div class="action-icon">📖</div>
+              <div class="action-icon"><AppIcon name="book" :size="24" /></div>
               <div class="action-info">
                 <h3>Browse Library</h3>
                 <p>Discover your next favorite book from our curated collection.</p>
@@ -76,7 +76,7 @@
             </router-link>
 
             <router-link to="/cart" class="action-card">
-              <div class="action-icon">🛒</div>
+              <div class="action-icon"><AppIcon name="cart" :size="24" /></div>
               <div class="action-info">
                 <h3>My Cart</h3>
                 <p>View and manage the books you've selected for checkout.</p>
@@ -85,7 +85,7 @@
             </router-link>
 
             <div class="action-card profile-card">
-              <div class="action-icon">👤</div>
+              <div class="action-icon"><AppIcon name="user" :size="24" /></div>
               <div class="action-info">
                 <h3>Account Details</h3>
                 <div class="info-list">
@@ -105,7 +105,7 @@
 
         <!-- Notice -->
         <div class="notice-card fade-in" style="animation-delay: 0.5s">
-          <div class="notice-icon">✨</div>
+          <div class="notice-icon"><AppIcon name="sparkles" :size="20" /></div>
           <div class="notice-text">
             <p><strong>Exclusive Access:</strong> As a registered reader, you have access to personalized recommendations and priority cart management.</p>
           </div>

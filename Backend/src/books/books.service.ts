@@ -138,68 +138,7 @@ async softRemoveBook(selectedId) {
   }
 
   private async seedDefaultBooks() {
-    const defaultBooks = [
-      {
-        title: '1984',
-        year: 1949,
-        editor: 'Secker and Warburg',
-        image: '',
-        author: { prenom: 'George', nom: 'Orwell' },
-        price: 20,
-        category: 'Fiction',
-        rating: 5,
-        isNew: false,
-        discount: 0,
-      },
-      {
-        title: 'Dune',
-        year: 1965,
-        editor: 'Chilton Books',
-        image: '',
-        author: { prenom: 'Frank', nom: 'Herbert' },
-        price: 25,
-        category: 'Sci-fi',
-        rating: 5,
-        isNew: false,
-        discount: 0,
-      },
-      {
-        title: 'Atomic Habits',
-        year: 2018,
-        editor: 'Avery',
-        image: '',
-        author: { prenom: 'James', nom: 'Clear' },
-        price: 32,
-        category: 'Self-help',
-        rating: 5,
-        isNew: false,
-        discount: 10,
-      },
-      {
-        title: 'Sapiens',
-        year: 2011,
-        editor: 'Harvill Secker',
-        image: '',
-        author: { prenom: 'Yuval Noah', nom: 'Harari' },
-        price: 35,
-        category: 'History',
-        rating: 4,
-        isNew: false,
-        discount: 15,
-      },
-      {
-        title: 'The Lean Startup',
-        year: 2011,
-        editor: 'Crown Publishing Group',
-        image: '',
-        author: { prenom: 'Eric', nom: 'Ries' },
-        price: 30,
-        category: 'Business',
-        rating: 4,
-        isNew: true,
-        discount: 0,
-      },
-    ];
+    const defaultBooks = [];
 
     for (const defaultBook of defaultBooks) {
       let author = await this.authorRepo.findOne({

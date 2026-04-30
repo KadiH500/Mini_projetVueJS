@@ -169,6 +169,18 @@
       </div>
     </section>
 
+    <!-- Category Header -->
+    <Transition name="fade" mode="out-in">
+      <div 
+        v-if="selectedCategory !== 'All' && categoryQuotes[selectedCategory]" 
+        :key="selectedCategory"
+        class="category-header"
+      >
+        <p class="category-quote">“{{ categoryQuotes[selectedCategory] }}”</p>
+        <h2 class="category-title">{{ selectedCategory }}</h2>
+      </div>
+    </Transition>
+
     <!-- ══════════════════ BOOKS GRID ══════════════════ -->
     <main class="books-section">
 
@@ -266,6 +278,67 @@
       </div>
     </Transition>
 
+    <!-- ══════════════════ HOW IT WORKS ══════════════════ -->
+    <section class="how-it-works" ref="howItWorksRef">
+      <div class="how-inner">
+        <h2 class="how-title">How Libraria Works</h2>
+        <div class="steps-grid">
+          <div class="step-card" v-for="(step, i) in steps" :key="i" :class="{ 'is-visible': isHowVisible }">
+            <div class="step-num-wrap">
+              <span class="step-number">{{ i + 1 }}</span>
+              <div v-if="i < 2" class="step-line"></div>
+            </div>
+            <div class="step-icon-box">
+              <AppIcon :name="step.icon" :size="32" stroke-width="1.2" />
+            </div>
+            <h3 class="step-label">{{ step.title }}</h3>
+            <p class="step-text">{{ step.text }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════ FOOTER ══════════════════ -->
+    <footer class="footer">
+      <div class="footer-inner">
+        <div class="footer-top">
+          <div class="footer-brand">
+            <router-link to="/" class="logo">
+              <span class="logo-icon"><AppIcon name="book" :size="18" /></span>
+              Libraria
+            </router-link>
+            <p class="brand-tagline">Curating stories for every reader since 2024.</p>
+          </div>
+          <div class="footer-links">
+            <div class="footer-col">
+              <h4>Shop</h4>
+              <a href="#books">All Books</a>
+              <a href="#categories">Categories</a>
+              <a href="#">Special Offers</a>
+            </div>
+            <div class="footer-col">
+              <h4>Support</h4>
+              <a href="#">Delivery Info</a>
+              <a href="#">Returns</a>
+              <a href="#">Contact Us</a>
+            </div>
+            <div class="footer-col">
+              <h4>Legal</h4>
+              <a href="#">Privacy Policy</a>
+              <a href="#">Terms of Service</a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2026 Libraria. Designed with passion for books.</p>
+          <div class="social-links">
+            <a href="#" aria-label="Instagram"><AppIcon name="heart" :size="16" /></a>
+            <a href="#" aria-label="Facebook"><AppIcon name="users" :size="16" /></a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
   </div>
 </template>
 
@@ -284,6 +357,16 @@ const lastAdded        = ref(null)
 const toast            = ref(null)
 const sortMenuOpen = ref(false)
 const sortTriggerRef = ref(null)
+const categoryQuotes = {
+  'Mystery': 'Shadows whisper, secrets hide, Truth waits just out of sight.',
+  'Drama': 'Hearts collide, voices rise, Every tear tells a story inside.',
+  'Fiction': 'Pages turn, worlds unfold, Every story a spark of gold.',
+  'Fantasy': 'Magic stirs, dreams take flight, Beyond the stars, beyond the night.',
+  'Social Fiction': 'Voices speak, truths ignite, Changing the world, one story at a time.',
+  'Romance': 'Eyes meet, hearts race, Love writes what time can’t erase.',
+  'Tragedy': 'Hope fades, echoes remain, Love and loss dance in pain.',
+  'Kids': 'Giggles bright, stories fun, Little adventures for everyone.'
+}
 const {
   loading,
   loadError,
@@ -320,9 +403,40 @@ const currentSortLabel = computed(() => {
   return selected?.label || 'Default'
 })
 
+// How It Works Logic
+const howItWorksRef = ref(null)
+const isHowVisible = ref(false)
+const steps = [
+  {
+    title: 'Choose Your Book',
+    text: 'Browse our wide collection and pick the book you love.',
+    icon: 'search-book'
+  },
+  {
+    title: 'We Deliver It',
+    text: 'We carefully pack your book and deliver it quickly to your doorstep.',
+    icon: 'package'
+  },
+  {
+    title: 'Read & Enjoy',
+    text: 'Relax, dive in, and enjoy your next great story.',
+    icon: 'sparkles'
+  }
+]
+
 onMounted(fetchBooks)
 onMounted(() => {
   document.addEventListener('click', handleOutsideSortClick)
+  
+  // Intersection Observer for How It Works
+  const observer = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting) {
+      isHowVisible.value = true
+      observer.disconnect()
+    }
+  }, { threshold: 0.2 })
+  
+  if (howItWorksRef.value) observer.observe(howItWorksRef.value)
 })
 onBeforeUnmount(() => {
   document.removeEventListener('click', handleOutsideSortClick)
@@ -339,7 +453,7 @@ function toggleWishlist(book) {
   const idx = wishlist.value.findIndex(b => b.id === book.id)
   if (idx === -1) {
     wishlist.value.push(book)
-    showToast(`"${book.title}" saved to wishlist ♥`, 'wish')
+    showToast(`"${book.title}" saved to wishlist`, 'wish')
   } else {
     wishlist.value.splice(idx, 1)
     showToast('Removed from wishlist', 'info')
@@ -802,19 +916,30 @@ function handleOutsideSortClick(event) {
 }
 .cat-icon { font-size: 15px; }
 
-/* Quote */
-.cat-quote {
-  background: var(--ink); color: var(--cream);
-  border-radius: var(--r); padding: 24px 32px;
-  margin-bottom: 32px; border-left: 4px solid var(--gold);
+/* ══ Category Header ══════════════════════════════════════════════════ */
+.category-header {
+  max-width: 1200px;
+  margin: 0 auto 32px;
+  padding: 0 28px;
+  text-align: center;
 }
-.quote-text {
-  font-size: 17px; font-style: italic; margin: 0 0 8px;
-  line-height: 1.5; color: #e8ddc8;
+
+.category-quote {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-style: italic;
+  font-size: 1.15rem;
+  color: var(--muted);
+  margin-bottom: 8px;
+  opacity: 0.85;
 }
-.quote-author {
-  font-family: sans-serif; font-size: 13px;
-  color: var(--gold); margin: 0; letter-spacing: 1px;
+
+.category-title {
+  font-size: clamp(24px, 4vw, 36px);
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.5px;
+  margin: 0;
+  text-transform: capitalize;
 }
 
 /* ══ Books section ═══════════════════════════════════════════════════ */
@@ -995,6 +1120,190 @@ function handleOutsideSortClick(event) {
 .toast-enter-active, .toast-leave-active { transition: opacity .3s, transform .3s; }
 .toast-enter-from { opacity: 0; transform: translateX(-50%) translateY(10px); }
 .toast-leave-to   { opacity: 0; transform: translateX(-50%) translateY(10px); }
+
+
+/* ══ How It Works ═════════════════════════════════════════════════════ */
+.how-it-works {
+  background: #fdfaf5;
+  border-top: 1px solid var(--sand);
+  padding: 60px 28px;
+}
+.how-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+.how-title {
+  text-align: center;
+  font-size: 24px;
+  color: var(--ink);
+  margin-bottom: 40px;
+  font-weight: 700;
+}
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+}
+.step-card {
+  text-align: center;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.step-card.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.step-card:nth-child(2) { transition-delay: 0.2s; }
+.step-card:nth-child(3) { transition-delay: 0.4s; }
+
+.step-num-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  position: relative;
+}
+.step-number {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid var(--gold);
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: bold;
+  background: #fff;
+  z-index: 2;
+}
+.step-line {
+  position: absolute;
+  left: calc(50% + 14px);
+  right: calc(-50% + 14px);
+  height: 1px;
+  background: var(--sand);
+  z-index: 1;
+}
+
+.step-icon-box {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  background: #fff;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brown);
+  box-shadow: 0 4px 12px rgba(124, 85, 51, 0.08);
+}
+
+.step-label {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.step-text {
+  font-family: sans-serif;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+  max-width: 240px;
+  margin: 0 auto;
+}
+
+/* ══ Footer ═══════════════════════════════════════════════════════════ */
+.footer {
+  background: var(--ink);
+  color: #b8a898;
+  padding: 60px 28px 30px;
+  border-top: 2px solid #2e2010;
+}
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.footer-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 60px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  margin-bottom: 30px;
+}
+.footer-brand {
+  max-width: 300px;
+}
+.brand-tagline {
+  font-size: 13px;
+  margin-top: 12px;
+  line-height: 1.6;
+  opacity: 0.7;
+}
+.footer-links {
+  display: flex;
+  gap: 60px;
+}
+.footer-col h4 {
+  color: var(--gold);
+  font-size: 14px;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.footer-col a {
+  color: inherit;
+  text-decoration: none;
+  font-family: sans-serif;
+  font-size: 13px;
+  transition: color 0.2s;
+}
+.footer-col a:hover {
+  color: var(--gold);
+}
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: sans-serif;
+  font-size: 12px;
+  opacity: 0.6;
+}
+.social-links {
+  display: flex;
+  gap: 16px;
+}
+.social-links a {
+  color: inherit;
+}
+.social-links a:hover {
+  color: var(--gold);
+}
+
+@media (max-width: 850px) {
+  .steps-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .step-line { display: none; }
+  .footer-top {
+    flex-direction: column;
+    gap: 40px;
+  }
+  .footer-links {
+    flex-wrap: wrap;
+    gap: 32px;
+  }
+}
 
 /* ══ Responsive ══════════════════════════════════════════════════════ */
 @media (max-width: 700px) {

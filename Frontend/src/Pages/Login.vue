@@ -9,7 +9,7 @@
     <div class="auth-card">
       <!-- Logo -->
       <div class="auth-logo">
-        <span class="logo-icon">📚</span>
+        <span class="logo-icon"><AppIcon name="book" :size="32" /></span>
         <h1>Libraria</h1>
         <p>Your digital library portal</p>
       </div>
@@ -37,7 +37,7 @@
           <div class="form-group" :class="{ error: loginErrors.identifiant }">
             <label for="login-identifiant">Email or Username</label>
             <div class="input-wrap">
-              <span class="input-icon">👤</span>
+              <span class="input-icon"><AppIcon name="user" :size="18" /></span>
               <input
                 id="login-identifiant"
                 v-model="loginForm.identifiant"
@@ -52,7 +52,7 @@
           <div class="form-group" :class="{ error: loginErrors.password }">
             <label for="login-password">Password</label>
             <div class="input-wrap">
-              <span class="input-icon">🔒</span>
+              <span class="input-icon"><AppIcon name="lock" :size="18" /></span>
               <input
                 id="login-password"
                 v-model="loginForm.password"
@@ -61,13 +61,13 @@
                 @blur="validateLoginField('password')"
               />
               <button type="button" class="eye-btn" @click="showLoginPwd = !showLoginPwd">
-                {{ showLoginPwd ? '🙈' : '👁️' }}
+                <AppIcon :name="showLoginPwd ? 'eye-off' : 'eye'" :size="16" />
               </button>
             </div>
             <p v-if="loginErrors.password" class="field-error">{{ loginErrors.password }}</p>
           </div>
 
-          <p v-if="loginServerError" class="server-error">⚠️ {{ loginServerError }}</p>
+          <p v-if="loginServerError" class="server-error"><AppIcon name="alert" :size="16" /> {{ loginServerError }}</p>
 
           <button id="btn-login" type="submit" class="btn-primary" :disabled="loginLoading">
             <span v-if="loginLoading" class="spinner"></span>
@@ -86,7 +86,7 @@
             <div class="form-group" :class="{ error: regErrors.name }">
               <label for="reg-name">Full Name</label>
               <div class="input-wrap">
-                <span class="input-icon">✨</span>
+                <span class="input-icon"><AppIcon name="sparkles" :size="18" /></span>
                 <input id="reg-name" v-model="regForm.name" type="text" placeholder="John Doe" @blur="validateRegField('name')" />
               </div>
               <p v-if="regErrors.name" class="field-error">{{ regErrors.name }}</p>
@@ -94,7 +94,7 @@
             <div class="form-group" :class="{ error: regErrors.username }">
               <label for="reg-username">Username</label>
               <div class="input-wrap">
-                <span class="input-icon">👤</span>
+                <span class="input-icon"><AppIcon name="user" :size="18" /></span>
                 <input id="reg-username" v-model="regForm.username" type="text" placeholder="johndoe" @blur="validateRegField('username')" />
               </div>
               <p v-if="regErrors.username" class="field-error">{{ regErrors.username }}</p>
@@ -104,7 +104,7 @@
           <div class="form-group" :class="{ error: regErrors.email }">
             <label for="reg-email">Email Address</label>
             <div class="input-wrap">
-              <span class="input-icon">📧</span>
+              <span class="input-icon"><AppIcon name="mail" :size="18" /></span>
               <input id="reg-email" v-model="regForm.email" type="email" placeholder="john@example.com" @blur="validateRegField('email')" />
             </div>
             <p v-if="regErrors.email" class="field-error">{{ regErrors.email }}</p>
@@ -113,7 +113,7 @@
           <div class="form-group" :class="{ error: regErrors.password }">
             <label for="reg-password">Password</label>
             <div class="input-wrap">
-              <span class="input-icon">🔒</span>
+              <span class="input-icon"><AppIcon name="lock" :size="18" /></span>
               <input
                 id="reg-password"
                 v-model="regForm.password"
@@ -123,7 +123,7 @@
                 @input="updateStrength"
               />
               <button type="button" class="eye-btn" @click="showRegPwd = !showRegPwd">
-                {{ showRegPwd ? '🙈' : '👁️' }}
+                <AppIcon :name="showRegPwd ? 'eye-off' : 'eye'" :size="16" />
               </button>
             </div>
             <div class="strength-bar">
@@ -136,7 +136,7 @@
           <div class="form-group" :class="{ error: regErrors.confirm }">
             <label for="reg-confirm">Confirm Password</label>
             <div class="input-wrap">
-              <span class="input-icon">🔐</span>
+              <span class="input-icon"><AppIcon name="lock" :size="18" /></span>
               <input
                 id="reg-confirm"
                 v-model="regForm.confirm"
@@ -145,7 +145,7 @@
                 @blur="validateRegField('confirm')"
               />
               <button type="button" class="eye-btn" @click="showConfirmPwd = !showConfirmPwd">
-                {{ showConfirmPwd ? '🙈' : '👁️' }}
+                <AppIcon :name="showConfirmPwd ? 'eye-off' : 'eye'" :size="16" />
               </button>
             </div>
             <p v-if="regErrors.confirm" class="field-error">{{ regErrors.confirm }}</p>

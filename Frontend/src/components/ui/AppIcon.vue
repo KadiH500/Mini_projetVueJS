@@ -88,6 +88,106 @@
       <path d="M18.5 2.5C18.8978 2.10217 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10217 21.5 2.5C21.8978 2.89782 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10217 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
     </template>
 
+    <!-- Package / Delivery -->
+    <template v-else-if="name === 'package'">
+      <path d="M12 2L3 7V17L12 22L21 17V7L12 2Z" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M3 7L12 12L21 7" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M12 22V12" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M16 14.3L20 12.1" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+    </template>
+
+    <!-- Search Book -->
+    <template v-else-if="name === 'search-book'">
+      <path d="M4 19.5V4.5C4 3.67157 4.67157 3 5.5 3H18.5C19.3284 3 20 3.67157 20 4.5V14" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" />
+      <path d="M4 17.5C4 16.6716 4.67157 16 5.5 16H12" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" />
+      <circle cx="17" cy="17" r="4" :stroke-width="strokeWidth" stroke="currentColor" />
+      <path d="M20 20L22 22" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" />
+    </template>
+
+    <!-- Sparkles / Magic -->
+    <template v-else-if="name === 'sparkles'">
+      <path d="M12 3L14.5 9L21 12L14.5 15L12 21L9.5 15L3 12L9.5 9L12 3Z" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M5 5L6 6" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" />
+      <path d="M18 18L19 19" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" />
+    </template>
+
+    <!-- Info / Details -->
+    <template v-else-if="name === 'info'">
+      <circle cx="12" cy="12" r="10" :stroke-width="strokeWidth" stroke="currentColor" />
+      <line x1="12" y1="16" x2="12" y2="12" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+      <line x1="12" y1="8" x2="12.01" y2="8" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+    </template>
+
+    <!-- Inbox / Empty -->
+    <template v-else-if="name === 'inbox'">
+      <polyline points="22 12 16 12 14 15 10 15 8 12 2 12" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+    </template>
+
+    <!-- User / Profile -->
+    <template v-else-if="name === 'user'">
+      <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+      <circle cx="12" cy="7" r="4" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+    </template>
+
+    <!-- Mail / Email -->
+    <template v-else-if="name === 'mail'">
+      <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4H4Z" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M22 6L12 13L2 6" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+    </template>
+
+    <!-- Lock / Password -->
+    <template v-else-if="name === 'lock'">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+    </template>
+
+    <!-- Alert / Warning -->
+    <template v-else-if="name === 'alert'">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+      <line x1="12" y1="9" x2="12" y2="13" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+      <line x1="12" y1="17" x2="12.01" y2="17" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+    </template>
+
+    <!-- Check / Success -->
+    <template v-else-if="name === 'check'">
+      <polyline points="20 6 9 17 4 12" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+    </template>
+
+    <!-- Plus / Add -->
+    <template v-else-if="name === 'plus'">
+      <line x1="12" y1="5" x2="12" y2="19" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+      <line x1="5" y1="12" x2="19" y2="12" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+    </template>
+
+    <!-- Minus / Remove -->
+    <template v-else-if="name === 'minus'">
+      <line x1="5" y1="12" x2="19" y2="12" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+    </template>
+
+    <!-- Chevron Down -->
+    <template v-else-if="name === 'chevron-down'">
+      <polyline points="6 9 12 15 18 9" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+    </template>
+
+    <!-- Close / X -->
+    <template v-else-if="name === 'close'">
+      <line x1="18" y1="6" x2="6" y2="18" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+      <line x1="6" y1="6" x2="18" y2="18" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+    </template>
+
+    <!-- Eye / Visibility -->
+    <template v-else-if="name === 'eye'">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+      <circle cx="12" cy="12" r="3" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+    </template>
+
+    <!-- Eye Off / Hidden -->
+    <template v-else-if="name === 'eye-off'">
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+      <line x1="1" y1="1" x2="23" y2="23" :stroke-width="strokeWidth" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+    </template>
+
     <!-- Star / Rating -->
     <template v-else-if="name === 'star'">
       <path

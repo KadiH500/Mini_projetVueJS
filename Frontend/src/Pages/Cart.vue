@@ -2,7 +2,7 @@
   <div class="cart-page">
     <div class="container">
       <header class="cart-header">
-        <h1 class="title">My Reading <span class="accent">Collection</span> 🛒</h1>
+        <h1 class="title">My Reading <span class="accent">Collection</span> <AppIcon name="cart" :size="32" /></h1>
         <p class="subtitle">Review your selected titles before checkout.</p>
       </header>
 
@@ -12,7 +12,7 @@
       </div>
 
       <div v-else-if="cartStore.items.length === 0" class="empty-cart">
-        <div class="empty-icon">📖</div>
+        <div class="empty-icon"><AppIcon name="book" :size="64" /></div>
         <h2>Your cart is empty</h2>
         <p>Looks like you haven't added any books yet.</p>
         <router-link to="/" class="btn-primary">Browse Library</router-link>
@@ -32,12 +32,18 @@
             </div>
             <div class="item-actions">
               <div class="quantity-control">
-                <button @click="cartStore.updateQuantity(item.id, item.quantity - 1)" class="q-btn">-</button>
+                <button @click="cartStore.updateQuantity(item.id, item.quantity - 1)" class="q-btn">
+                  <AppIcon name="minus" :size="12" />
+                </button>
                 <span class="quantity">{{ item.quantity }}</span>
-                <button @click="cartStore.updateQuantity(item.id, item.quantity + 1)" class="q-btn">+</button>
+                <button @click="cartStore.updateQuantity(item.id, item.quantity + 1)" class="q-btn">
+                  <AppIcon name="plus" :size="12" />
+                </button>
               </div>
               <p class="item-total">{{ (item.book.price * item.quantity).toFixed(2) }} TND</p>
-              <button @click="cartStore.removeItem(item.id)" class="remove-btn" title="Remove Item">🗑</button>
+              <button @click="cartStore.removeItem(item.id)" class="remove-btn" title="Remove Item">
+                <AppIcon name="trash" :size="20" />
+              </button>
             </div>
           </div>
         </div>
@@ -57,7 +63,7 @@
             <button class="btn-clear" @click="cartStore.clearCart">Clear Cart</button>
           </div>
           <div class="guarantee">
-            <span class="icon">🔒</span>
+            <span class="icon"><AppIcon name="lock" :size="24" /></span>
             <p>Secure checkout and instant access to digital copies.</p>
           </div>
         </aside>
@@ -69,6 +75,7 @@
 <script setup>
 import { onMounted } from 'vue'
 import { UseCartStore } from '../Store/UseCartStore'
+import AppIcon from '../components/ui/AppIcon.vue'
 
 const cartStore = UseCartStore()
 

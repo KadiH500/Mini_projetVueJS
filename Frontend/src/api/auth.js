@@ -5,13 +5,13 @@ const api = axios.create({
 });
 
 /**
- * Register a new user
+ * creation mta user jdid
  * @param {{ name: string, email: string, username: string, password: string, role: string }} data
  */
 export const register = (data) => api.post('/auth/signup', data);
 
 /**
- * Sign in an existing user
+ * login mta user existant
  * @param {{ identifiant: string, password: string }} data
  */
 export const login = (data) => api.post('/auth/signin', data);

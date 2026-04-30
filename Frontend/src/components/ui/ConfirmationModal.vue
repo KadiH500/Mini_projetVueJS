@@ -3,8 +3,7 @@
     <div v-if="show" class="modal-overlay" @click.self="$emit('cancel')">
       <div class="modal-card">
         <div class="modal-icon" :class="type">
-          <span v-if="type === 'danger'">⚠️</span>
-          <span v-else>ℹ️</span>
+          <AppIcon :name="type === 'danger' ? 'alert' : 'info'" :size="32" />
         </div>
         <h3 class="modal-title">{{ title }}</h3>
         <p class="modal-message">{{ message }}</p>
@@ -25,6 +24,8 @@
 </template>
 
 <script setup>
+import AppIcon from './AppIcon.vue'
+
 defineProps({
   show: Boolean,
   title: String,
