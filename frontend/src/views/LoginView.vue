@@ -1,124 +1,219 @@
 <template>
-  <div class="auth-container">
-    <div class="auth-card">
-      <h1>Welcome back </h1>
-      <p>Login to continue</p>
+  <div class="auth-page">
+    <Navbar />
+    <div class="auth-wrapper">
+      <div class="auth-box">
+        <h2>{{ isLogin ? 'Connexion' : 'Inscription' }}</h2>
 
-      <input v-model="email" type="email" placeholder="Email" />
-      <input v-model="password" type="password" placeholder="Password" />
+        <!-- Login Form -->
+        <form v-if="isLogin" @submit.prevent="handleLogin" class="auth-form">
+          <div class="form-group">
+            <label>Identifiant (username ou email)</label>
+            <input v-model="loginForm.identifiant" type="text" placeholder="Votre identifiant" required />
+          </div>
+          <div class="form-group">
+            <label>Mot de passe</label>
+            <input v-model="loginForm.password" type="password" placeholder="Votre mot de passe" required />
+          </div>
+          <div v-if="errorMsg" class="error-msg">{{ errorMsg }}</div>
+          <button type="submit" class="btn-primary" :disabled="loading">
+            {{ loading ? 'Connexion...' : 'Se connecter' }}
+          </button>
+          <button type="button" class="btn-switch" @click="isLogin = false">
+            Créer un compte
+          </button>
+        </form>
 
-      <button @click="login">Sign In</button>
-
-      <p class="switch">
-        Don't have an account?
-        <router-link to="/register">Create account</router-link>
-      </p>
+        <!-- Register is on separate page, but can switch here too -->
+        <form v-else @submit.prevent="handleRegister" class="auth-form">
+          <div class="form-group">
+            <label>Username</label>
+            <input v-model="registerForm.username" type="text" required />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input v-model="registerForm.email" type="email" required />
+          </div>
+          <div class="form-group">
+            <label>Mot de passe</label>
+            <input v-model="registerForm.password" type="password" required />
+          </div>
+          <div v-if="errorMsg" class="error-msg">{{ errorMsg }}</div>
+          <div v-if="successMsg" class="success-msg">{{ successMsg }}</div>
+          <button type="submit" class="btn-primary" :disabled="loading">
+            {{ loading ? 'Inscription...' : "S'inscrire" }}
+          </button>
+          <button type="button" class="btn-switch" @click="isLogin = true">
+            Déjà un compte ? Se connecter
+          </button>
+        </form>
+      </div>
     </div>
+    <Footer />
   </div>
 </template>
 
-<script>
-import axios from "axios";
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import Navbar from '@/components/Navbar.vue'
+import Footer from '@/components/Footer.vue'
+import { useUserStore } from '@/stores/userStore'
 
-export default {
-  data() {
-    return {
-      email: "",
-      password: "",
-    };
-  },
-  methods: {
-    async login() {
-      try {
-        const res = await axios.post("http://localhost:3000/auth/signin", {
-          email: this.email,
-          password: this.password,
-        });
+const router = useRouter()
+const userStore = useUserStore()
 
-        // stocker le token
-        localStorage.setItem("token", res.data.access_token);
+const isLogin = ref(true)
+const loading = ref(false)
+const errorMsg = ref('')
+const successMsg = ref('')
 
-        // redirection vers dashboard
-        this.$router.push("/dashboard");
+const loginForm = ref({ identifiant: '', password: '' })
+const registerForm = ref({ username: '', email: '', password: '' })
 
-      } catch (err) {
-        alert("Invalid credentials");
-        console.error(err);
-      }
-    },
-  },
-};
+async function handleLogin() {
+  loading.value = true
+  errorMsg.value = ''
+  try {
+    await userStore.signIn(loginForm.value.identifiant, loginForm.value.password)
+    router.push('/dashboard')
+  } catch (e: any) {
+    errorMsg.value = e.response?.data?.message || 'Identifiant ou mot de passe incorrect'
+  } finally {
+    loading.value = false
+  }
+}
+
+async function handleRegister() {
+  loading.value = true
+  errorMsg.value = ''
+  successMsg.value = ''
+  try {
+    await userStore.signUp(registerForm.value.username, registerForm.value.email, registerForm.value.password)
+    successMsg.value = 'Compte créé ! Vous pouvez maintenant vous connecter.'
+    isLogin.value = true
+  } catch (e: any) {
+    errorMsg.value = e.response?.data?.message || 'Erreur lors de l\'inscription'
+  } finally {
+    loading.value = false
+  }
+}
 </script>
 
 <style scoped>
-.auth-container {
-  height: 100vh;
+.auth-page {
+  min-height: 100vh;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  background: #2c2c3e;
+}
+
+.auth-wrapper {
+  flex: 1;
+  display: flex;
   align-items: center;
-  background: radial-gradient(circle at top, #1f2937, #0f172a);
+  justify-content: center;
+  padding: 3rem 1rem;
 }
 
-.auth-card {
-  width: 380px;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 35px;
-  border-radius: 18px;
-  color: white;
+.auth-box {
+  background: white;
+  padding: 2rem 2.5rem;
+  border-radius: 6px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.auth-box h2 {
   text-align: center;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  margin-bottom: 1.5rem;
+  color: #1a3a6b;
+  font-size: 1.4rem;
 }
 
-h1 {
-  margin-bottom: 5px;
-  font-size: 24px;
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-p {
-  font-size: 14px;
-  opacity: 0.7;
-  margin-bottom: 20px;
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
 }
 
-input {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 12px;
-  border-radius: 10px;
-  border: none;
+.form-group label {
+  font-size: 0.85rem;
+  color: #444;
+  font-weight: 500;
+}
+
+.form-group input {
+  border: 1px solid #ccc;
+  padding: 0.55rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
   outline: none;
-  background: rgba(255, 255, 255, 0.1);
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+  border-color: #2563a8;
+}
+
+.btn-primary {
+  background: #2563a8;
   color: white;
-}
-
-input::placeholder {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-button {
-  width: 100%;
-  padding: 12px;
   border: none;
-  border-radius: 10px;
-  background: linear-gradient(90deg, #6366f1, #8b5cf6);
-  color: white;
-  font-weight: bold;
+  padding: 0.65rem;
+  border-radius: 4px;
+  font-size: 0.95rem;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background 0.2s;
+  font-weight: 600;
 }
 
-button:hover {
-  transform: scale(1.03);
+.btn-primary:hover:not(:disabled) {
+  background: #1a4f8c;
 }
 
-.switch {
-  margin-top: 15px;
-  font-size: 13px;
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-.switch a {
-  color: #a78bfa;
+.btn-switch {
+  background: #4a6fa5;
+  color: white;
+  border: none;
+  padding: 0.6rem;
+  border-radius: 4px;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-switch:hover {
+  background: #3a5a8c;
+}
+
+.error-msg {
+  background: #fee;
+  color: #c00;
+  padding: 0.5rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  border-left: 3px solid #c00;
+}
+
+.success-msg {
+  background: #efe;
+  color: #060;
+  padding: 0.5rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  border-left: 3px solid #060;
 }
 </style>
